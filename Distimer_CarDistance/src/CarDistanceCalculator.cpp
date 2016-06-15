@@ -1,3 +1,5 @@
+#pragma once
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <algorithm>
@@ -10,6 +12,7 @@
 #include <unistd.h>
 #include <string>
 #include <stdio.h>
+#include <sys/wait.h>
 
 using namespace cv;
 using namespace std;
@@ -88,6 +91,8 @@ int runFromCamera(char * haar, char * noderedApi, bool isShowVideo) {
 	//cv::VideoCapture video(const_cast<char*>("FILE0026_new.mp4"));
 	cv::VideoCapture video(0);
 	cv::Mat img_src;
+	cv::Mat img_dst;
+
 	video.read(img_src);
 	if (img_src.empty())
 		return 0;
@@ -97,43 +102,51 @@ int runFromCamera(char * haar, char * noderedApi, bool isShowVideo) {
 	int iWidth = 640;
 	double dRatio = (double) 640 / img_src.cols;
 
-	int waitInterval = 10;
+	int waitInterval = 100;
 
 	//// Run current video
 	//int pidId = fork();
+	//int pidId;
 	char apiUrl[255];
+	int statval = -1, iDistance;
 
 	while (m_isRunning) {
-		cv::Mat img_src;
-		cv::Mat img_dst;
+
 		video.read(img_src);
 		if (img_src.empty())
 			m_isRunning = false;
 
 		//// Run calculate distance
 		// AnhNT62: ---- Main function .
-		int iDistance = carDistanceObj->RunSingle(img_src, dRatio, img_dst);
+		iDistance = carDistanceObj->RunSingle(img_src, dRatio, img_dst);
 		if (isShowVideo) {
 			cv::imshow("Result", img_dst);
 		}
 
 		if (iDistance > 0) {
+			cout << iDistance << std::endl;
+
 			int pidId = fork();
+			printf("pid=%d, %s%d\n", pidId, noderedApi, iDistance);
+
 			if (pidId == 0) {
 				try {
-					int iStop = clock();
-					sprintf(apiUrl, "%s%s", noderedApi, iDistance);
+					sprintf(apiUrl, "%s%d", noderedApi, iDistance);
 
 					cout << apiUrl << endl;
 					execl("/usr/bin/curl", "curl", apiUrl, (char *) 0);
 				} catch (Exception e) {
 				}
+			} else {
+				cout << "can't run execl " << endl;
 			}
+		} else  {
+			cout << currentDateTime() << "\t-1" << endl;
 		}
 
-		cout << iDistance << std::endl;
 
-		//int key = cv::waitKey(10);
+
+		int key = cv::waitKey(10);
 		this_thread::sleep_for(chrono::milliseconds(waitInterval));
 	}					//// End of run current video
 
@@ -198,4 +211,6 @@ int main(int argc, char** argv) {
 		}
 	}
 
+	waitKey(0);
+	return 0;
 }

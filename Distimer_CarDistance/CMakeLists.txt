@@ -18,7 +18,7 @@ SET(HEADER_FILES ${PROJ_PATH}/Camera.h
 	${PROJ_PATH}/CascadeClassifier.h
 	${PROJ_PATH}/param.h)
 
-
+project(Distimer_CarDistance)
 find_package( OpenCV REQUIRED )
 add_executable(Distimer_CarDistance ${SOURCES} ${HEADER_FILES})
 target_link_libraries( Distimer_CarDistance ${OpenCV_LIBS} )
