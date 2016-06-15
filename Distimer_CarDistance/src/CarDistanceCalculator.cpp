@@ -80,7 +80,8 @@ int testFromVideo() {
 	return 0;
 }
 
-int runFromCamera(char * haar, char * noderedApi, bool isShowVideo) {
+int runFromCamera(char * haar, int cameraId, char * noderedApi,
+		bool isShowVideo) {
 	//// Init detect module
 	CCarDistance *carDistanceObj = new CCarDistance();
 	int rsInit = carDistanceObj->Init(const_cast<char*>(haar));
@@ -89,11 +90,17 @@ int runFromCamera(char * haar, char * noderedApi, bool isShowVideo) {
 
 	//// Read video from video
 	//cv::VideoCapture video(const_cast<char*>("FILE0026_new.mp4"));
-	cv::VideoCapture video(0);
+	cv::VideoCapture cameraRecord(cameraId);
+
+	if (!cameraRecord.isOpened()) { //check if video device has been initialised
+		cout << "cannot open camera cameraId=" << cameraId << endl;
+		exit(1);
+	}
+
 	cv::Mat img_src;
 	cv::Mat img_dst;
 
-	video.read(img_src);
+	cameraRecord.read(img_src);
 	if (img_src.empty())
 		return 0;
 
@@ -112,7 +119,7 @@ int runFromCamera(char * haar, char * noderedApi, bool isShowVideo) {
 
 	while (m_isRunning) {
 
-		video.read(img_src);
+		cameraRecord.read(img_src);
 		if (img_src.empty())
 			m_isRunning = false;
 
@@ -140,11 +147,9 @@ int runFromCamera(char * haar, char * noderedApi, bool isShowVideo) {
 			} else {
 				cout << "can't run execl " << endl;
 			}
-		} else  {
+		} else {
 			cout << currentDateTime() << "\t-1" << endl;
 		}
-
-
 
 		int key = cv::waitKey(10);
 		this_thread::sleep_for(chrono::milliseconds(waitInterval));
@@ -179,19 +184,22 @@ int main(int argc, char** argv) {
 	bool isFromCamera = true;
 
 	if (isFromCamera) {
-		if (argc < 3) {
-			cout << "App XML API isShowVideo" << endl;
+		if (argc < 4) {
 			cout
-					<< "Ex: Distimer_CarDistance G21_haar_v6.0_basic_24.xml http://localhost:1880/api/cardistance/?distance= true"
+					<< "Distimer_CarDistance <XML file> <nodered API link> <cameraId> [isShowVideo=false]"
+					<< endl;
+			cout
+					<< "Ex: Distimer_CarDistance G21_haar_v6.0_basic_24.xml 0 http://localhost:1880/api/cardistance/?distance= true"
 					<< endl;
 			cout << "-1" << endl;
 			return -1;
 		} else {
 			bool isShowVideo = false;
-			if (argc == 4) {
+			if (argc == 5) {
 				isShowVideo = true;
 			}
-			runFromCamera(argv[1], argv[2], isShowVideo);
+			int camId = argv[2][0] - '0';
+			runFromCamera(argv[1], camId, argv[3], isShowVideo);
 		}
 	} else {
 		bool hardImage = false;
