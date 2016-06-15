@@ -23,7 +23,7 @@ class frm {
 	public:
 	  frm();
 	  ~frm();
-	void startWork(char * haarcascade_frontalface_alt, char * noderedApi);
+	void startWork(char * haarcascade_frontalface_alt, char * noderedApi, bool isShowVideo);
           void test(int& a);
 	private: 
 	  int checkEyesBlinkStatus(cv::Mat frame, bool& isBlink);

@@ -40,8 +40,7 @@ const std::string currentDateTime() {
 }
 
 // Capture video and create data for report.
-void frm::startWork(char * haarcascade_frontalface_alt, char * noderedApi) {
-	bool isShowVideo = true;
+void frm::startWork(char * haarcascade_frontalface_alt, char * noderedApi, bool isShowVideo) {
 	try {
 		m_face_cascade = new cv::CascadeClassifier(haarcascade_frontalface_alt);
 		if (m_face_cascade->empty()) {
@@ -70,8 +69,11 @@ void frm::startWork(char * haarcascade_frontalface_alt, char * noderedApi) {
 			int winH = imageCaptureFull.rows;
 			calculateCropROI(imageCaptureFull, winX, winY, winW, winH);
 			Mat imageCrop = imageCaptureFull(cv::Rect(winX, winY, winW, winH));
-			imshow("camera", imageCrop); //show camera for verification
-			waitKey(waitInterval);
+
+			if (isShowVideo) {
+				imshow("camera", imageCrop); //show camera for verification
+				waitKey(waitInterval);
+			}
 
 			//Create report data
 			bool status = false;
