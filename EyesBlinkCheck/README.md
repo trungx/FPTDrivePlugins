@@ -1,0 +1,1 @@
+./EyesBlinkDetect haarcascade_frontalface_alt.xml http://localhost:1880/api/eyesblinked

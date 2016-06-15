@@ -1,4 +1,3 @@
-
 #define DEMO_FACE_MODEL_SIZE			595
 #define DEMO_MAX_CONF_BUFF			30000//24  // check trong DEMO_MAX_CONF_BUFF frame gan day nhat, tim xem bo nao xuat hien nhieu nhat
 #define DEMO_MAX_ID					100	// qua DEMO_MAX_ID ong thi treo day
