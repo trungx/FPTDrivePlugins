@@ -101,6 +101,8 @@ int runFromCamera(char * haar, char * noderedApi, bool isShowVideo) {
 
 	//// Run current video
 	//int pidId = fork();
+	char apiUrl[255];
+
 	while (m_isRunning) {
 		cv::Mat img_src;
 		cv::Mat img_dst;
@@ -119,9 +121,11 @@ int runFromCamera(char * haar, char * noderedApi, bool isShowVideo) {
 			int pidId = fork();
 			if (pidId == 0) {
 				try {
-					cout << noderedApi << iDistance << endl;
-					execl("/usr/bin/curl", "curl", noderedApi, iDistance,
-							(char *) 0);
+					int iStop = clock();
+					sprintf(apiUrl, "%s%s", noderedApi, iDistance);
+
+					cout << apiUrl << endl;
+					execl("/usr/bin/curl", "curl", apiUrl, (char *) 0);
 				} catch (Exception e) {
 				}
 			}
