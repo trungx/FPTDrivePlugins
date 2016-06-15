@@ -40,16 +40,17 @@ const std::string currentDateTime() {
 }
 
 // Capture video and create data for report.
-void frm::startWork(char * haarcascade_frontalface_alt, char * noderedApi, bool isShowVideo) {
+void frm::startWork(char * haarcascade_frontalface_alt, int cameraId, char * noderedApi, bool isShowVideo) {
 	try {
 		m_face_cascade = new cv::CascadeClassifier(haarcascade_frontalface_alt);
 		if (m_face_cascade->empty()) {
 			printf("Error on loading face cascade");
 		}
 
-		VideoCapture cameraRecord(0); //0 is the id of video device.0 if you have only one camera.
+		VideoCapture cameraRecord(cameraId); //0 is the id of video device.0 if you have only one camera.
 		if (!cameraRecord.isOpened()) { //check if video device has been initialised
-			cout << "cannot open camera";
+			cout << "cannot open camera cameraId=" << cameraId << endl;
+			exit(1);
 		}
 
 		// set up parameter :
